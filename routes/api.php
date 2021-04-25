@@ -3,6 +3,12 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use API\Admin\MapelController;
+use API\Admin\GuruController;
+use API\Admin\KelasController;
+use API\Admin\SiswaController;
+use API\Admin\JadwalController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,18 +20,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/login', 'API\Auth\LoginController@login');
+Route::post('/login', 'API\Auth\LoginController@loginAsStudentAndTeacher');
+
+Route::post('/logout', 'API\Auth\LoginController@logout');
 
 Route::prefix('/admin')->group(function(){
-    Route::prefix('/mapel')->group(function(){
-        Route::get('/', 'API\Admin\MapelController@read');
-        Route::get('/find/{id}', 'API\Admin\MapelController@find');
-        Route::post('/store', 'API\Admin\MapelController@store');
-        Route::put('/update/{id}', 'API\Admin\MapelController@update');
-        Route::delete('/delete/{id}', 'API\Admin\MapelController@delete');
-    });
+    Route::post('/login', 'API\Auth\LoginController@loginAsAdmin');
+
+    Route::apiResource('/mapel', MapelController::class);
+    Route::apiResource('/guru', GuruController::class);
+    Route::apiResource('/kelas', KelasController::class);
+    Route::apiResource('/siswa', SiswaController::class);
+    Route::apiResource('/jadwal', JadwalController::class);
 });
 
-// Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::prefix('/guru')->group(function(){
+    Route::get('/get-schedule', 'API\Guru\HomeController@getSchedule');
+    Route::get('/get-absent', 'API\Guru\HomeController@getAbsent');
+});
